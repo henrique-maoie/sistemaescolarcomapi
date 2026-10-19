@@ -1,0 +1,23 @@
+ALTERAÇÕES IMPLEMENTADAS
+========================
+1. Login: depois de autenticar, mostra mensagem "Bem-vindo(a), NOME! Você entrou na sua conta com sucesso.". O nome é obtido do cadastro relacionado ou, como alternativa, do e-mail.
+2. Biblioteca: nova área no menu lateral com pesquisa por título/autor/ISBN/categoria.
+3. Ficha completa do livro: autor, ISBN, editora, ano, categoria, quantidade, descrição, avaliação, datas de criação e atualização.
+4. Cadastro e edição de livros com campos bibliográficos, quantidade e avaliação de 0 a 5 estrelas.
+5. Exclusão de livro com confirmação do navegador.
+6. API REST JSON para listar, consultar, cadastrar, atualizar e excluir livros.
+7. GET /api/rotas lista dinamicamente os endpoints registrados no Flask.
+8. API_E_PONTOS_DE_ALTERACAO.txt documenta APIs, campos, exemplos e arquivos/trechos onde fazer alterações.
+
+ARQUIVOS PRINCIPAIS
+===================
+app.py — login, persistência SQLite, rotas HTML e APIs.
+templates/base.html — link de navegação Biblioteca.
+templates/biblioteca/listar.html — lista e pesquisa.
+templates/biblioteca/detalhe.html — ficha detalhada.
+templates/biblioteca/formulario.html — cadastro e edição.
+API_E_PONTOS_DE_ALTERACAO.txt — inventário e instruções das APIs.
+
+NOTA DE COMPATIBILIDADE
+=======================
+A tabela livros é criada automaticamente com CREATE TABLE IF NOT EXISTS quando o aplicativo inicia. Não apaga tabelas existentes. Faça cópia de escola.db antes de executar em ambiente com dados reais.

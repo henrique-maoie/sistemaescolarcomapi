@@ -1,0 +1,65 @@
+INVENTÁRIO DE APIs E PONTOS DE ALTERAÇÃO
+========================================
+Projeto: Gestão Escolar (Flask + SQLite)
+
+RESUMO
+------
+O projeto já possui rotas Flask que funcionam como páginas do sistema. Nesta revisão foram adicionadas APIs REST JSON para a biblioteca e uma rota de diagnóstico que lista os endpoints registrados.
+
+NOVAS ROTAS DA BIBLIOTECA (HTML)
+--------------------------------
+GET  /biblioteca                         Lista e pesquisa livros (?q=termo)
+GET  /biblioteca/livro/<id>              Ficha completa do livro
+GET  /biblioteca/livro/novo              Formulário de cadastro
+POST /biblioteca/livro/novo              Grava livro
+GET  /biblioteca/livro/<id>/editar       Formulário de edição
+POST /biblioteca/livro/<id>/editar       Atualiza livro
+POST /biblioteca/livro/<id>/excluir      Exclui livro (confirmação no navegador)
+
+NOVAS APIs REST (JSON)
+----------------------
+GET    /api/livros              Lista livros; aceita ?q=termo
+POST   /api/livros              Cadastra livro. JSON: titulo, autor (obrigatórios), isbn, editora, ano_publicacao, categoria, descricao, quantidade, avaliacao.
+GET    /api/livros/<id>         Retorna a ficha completa; 404 se não encontrado.
+PUT    /api/livros/<id>         Atualiza os campos enviados; titulo e autor obrigatórios no registro final.
+DELETE /api/livros/<id>         Exclui livro.
+GET    /api/rotas               Lista os endpoints Flask atualmente registrados.
+
+Exemplo de cadastro via HTTP:
+POST /api/livros
+Content-Type: application/json
+{
+  "titulo": "O Pequeno Príncipe",
+  "autor": "Antoine de Saint-Exupéry",
+  "isbn": "978...",
+  "editora": "Editora exemplo",
+  "ano_publicacao": 2024,
+  "categoria": "Literatura",
+  "descricao": "Descrição completa do livro.",
+  "quantidade": 3,
+  "avaliacao": 5
+}
+
+ROTAS JÁ EXISTENTES
+-------------------
+O aplicativo principal é Alunos3B/school_system/app.py. Ele já continha endpoints HTML para login/cadastro, dashboard, alunos, turmas, pedagogia, área comercial/financeira, frequência, notas, anexos, relatórios e administração. Consulte /api/rotas com o servidor ligado para a lista completa e atualizada de caminho, métodos HTTP e nome da função.
+Também há módulos auxiliares admin_rotas.py e NOVAS_ROTAS_FINANCEIRAS.py; confirme no app.py se estão registrados/importados antes de assumir que seus endpoints estão ativos.
+
+ONDE ALTERAR
+-------------
+1. app.py, bloco de inicialização próximo ao topo: CREATE TABLE IF NOT EXISTS livros. Altere aqui o esquema da tabela. Se adicionar coluna, planeje migração do banco SQLite existente.
+2. app.py, seção "BIBLIOTECA — rotas HTML e API JSON": lógica de listagem, detalhe, cadastro, edição, exclusão e endpoints JSON.
+3. app.py, função _dados_livro_form(): campos e validações do formulário HTML.
+4. templates/biblioteca/listar.html: colunas, busca e listagem.
+5. templates/biblioteca/detalhe.html: campos exibidos na ficha completa.
+6. templates/biblioteca/formulario.html: campos de cadastro/edição e seletor de avaliação por estrelas.
+7. templates/base.html: link Biblioteca no menu lateral.
+8. app.py, função login(): mensagem de boas-vindas após autenticação. O nome vem de carregar_contexto_usuario(); se o registro não tiver nome relacionado, usa o e-mail.
+
+SEGURANÇA / NOTAS
+-----------------
+- As páginas HTML da biblioteca exigem login.
+- As APIs /api/livros e /api/rotas foram deixadas sem autenticação para facilitar integração/teste. Antes de publicar na internet, adicione autenticação/autorização (por exemplo token/API key ou sessão e proteção apropriada), rate limiting e validação mais estrita.
+- A exclusão de livros é permanente no SQLite. Faça backup antes de testar em produção.
+- A avaliação é numérica de 0 a 5, exibida visualmente como estrelas; não é um sistema de avaliações individuais por usuário.
+- Para chamadas POST/PUT inválidas, confira o JSON de resposta e o status HTTP.

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Editar livro' if livro else 'Cadastrar livro' }}{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>{{ 'Editar livro' if livro else 'Cadastrar livro' }}</h1><p class="subtext">Preencha os dados bibliográficos e a avaliação de 1 a 5 estrelas.</p></div><a href="/biblioteca">Voltar ao acervo</a></div>
+<form method="post" class="card" style="padding:24px;margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px">
+{% for campo,label,placeholder in [('titulo','Título *','Título do livro'),('autor','Autor *','Nome do autor'),('isbn','ISBN','ISBN'),('editora','Editora','Nome da editora'),('ano_publicacao','Ano de publicação','Ex.: 2024'),('categoria','Categoria','Ex.: Literatura') ] %}<div class="form-group"><label for="{{ campo }}">{{ label }}</label><input id="{{ campo }}" name="{{ campo }}" placeholder="{{ placeholder }}" value="{{ livro[campo] if livro and livro[campo] is not none else '' }}" {% if campo in ['titulo','autor'] %}required{% endif %} {% if campo=='ano_publicacao' %}type="number" min="0" max="3000"{% endif %}></div>{% endfor %}
+<div class="form-group"><label for="quantidade">Exemplares disponíveis</label><input id="quantidade" name="quantidade" type="number" min="0" value="{{ livro.quantidade if livro else 1 }}"></div>
+<div class="form-group"><label for="avaliacao">Avaliação por estrelas</label><select id="avaliacao" name="avaliacao">{% for n in range(0,6) %}<option value="{{ n }}" {% if livro and livro.avaliacao|int == n %}selected{% elif not livro and n==0 %}selected{% endif %}>{{ '☆' * n }}{{ '☆' * (5-n) }} — {{ n }} de 5</option>{% endfor %}</select></div>
+<div class="form-group" style="grid-column:1/-1"><label for="descricao">Descrição / sinopse</label><textarea id="descricao" name="descricao" rows="5" placeholder="Resumo, assunto, edição, observações...">{{ livro.descricao if livro else '' }}</textarea></div>
+<div style="grid-column:1/-1;display:flex;gap:12px;align-items:center"><button type="submit">{{ 'Salvar alterações' if livro else 'Cadastrar livro' }}</button><a href="/biblioteca">Cancelar</a></div>
+</form>
+{% endblock %}

@@ -30,6 +30,10 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 try:
     criar_banco_dados()
+    # BIBLIOTECA: tabela isolada do domínio escolar; altere aqui o esquema inicial dos livros.
+    _conn = sqlite3.connect(DB_PATH)
+    _conn.execute('''CREATE TABLE IF NOT EXISTS livros (id INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT NOT NULL, autor TEXT NOT NULL, isbn TEXT, editora TEXT, ano_publicacao INTEGER, categoria TEXT, descricao TEXT, quantidade INTEGER NOT NULL DEFAULT 1, avaliacao REAL NOT NULL DEFAULT 0 CHECK(avaliacao >= 0 AND avaliacao <= 5), criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP, atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+    _conn.commit(); _conn.close()
 except Exception as erro:
     print(f"Erro ao preparar banco de dados: {erro}")
 
@@ -227,7 +231,7 @@ def login():
             session['tabela_referencia'] = usuario['tabela_referencia']
             carregar_contexto_usuario(usuario)
             registrar_audit(usuario['id_referencia'], usuario['tipo_usuario'], 'LOGIN', 'usuarios', usuario['id_referencia'], {})
-            flash('Login realizado!', 'success')
+            flash(f"Bem-vindo(a), {session.get('nome_usuario') or usuario.get('email')}! Você entrou na sua conta com sucesso.", 'success')
             return redirect('/dashboard')
         else:
             flash('Email ou senha incorretos!', 'error')
@@ -1540,6 +1544,130 @@ def novo_setor():
         flash('Erro!', 'error')
 
     return render_template('admin/setores/novo.html')
+
+# ============================================================================
+# BIBLIOTECA — rotas HTML e API JSON
+# Ponto de alteração: ajuste os campos/validações aqui e o esquema em criar_banco_dados()
+# (bloco de inicialização de livros no início deste arquivo).
+# ============================================================================
+def _livro_dict(row):
+    return dict(row) if row else None
+
+@app.route('/biblioteca')
+@login_requerido()
+def biblioteca():
+    termo = (request.args.get('q') or '').strip()
+    if termo:
+        livros = executar_query("SELECT * FROM livros WHERE titulo LIKE ? OR autor LIKE ? OR isbn LIKE ? OR categoria LIKE ? ORDER BY titulo", (f'%{termo}%',)*4) or []
+    else:
+        livros = executar_query('SELECT * FROM livros ORDER BY titulo') or []
+    return render_template('biblioteca/listar.html', livros=livros, termo=termo)
+
+@app.route('/biblioteca/livro/<int:livro_id>')
+@login_requerido()
+def biblioteca_detalhe(livro_id):
+    livro = executar_query('SELECT * FROM livros WHERE id = ?', (livro_id,), fetch_one=True)
+    if not livro:
+        flash('Livro não encontrado.', 'error'); return redirect('/biblioteca')
+    return render_template('biblioteca/detalhe.html', livro=livro)
+
+@app.route('/biblioteca/livro/novo', methods=['GET', 'POST'])
+@login_requerido()
+def biblioteca_novo():
+    if request.method == 'POST':
+        dados = _dados_livro_form()
+        if not dados['titulo'] or not dados['autor']:
+            flash('Título e autor são obrigatórios.', 'error')
+        else:
+            ok = executar_update('INSERT INTO livros (titulo, autor, isbn, editora, ano_publicacao, categoria, descricao, quantidade, avaliacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', dados.values())
+            if ok:
+                flash('Livro cadastrado com sucesso.', 'success'); return redirect('/biblioteca')
+            flash('Não foi possível cadastrar o livro. Verifique os dados.', 'error')
+    return render_template('biblioteca/formulario.html', livro=None)
+
+def _dados_livro_form():
+    # Alteração dos campos aceitos pelo formulário de cadastro/edição.
+    form = request.form
+    try: ano = int(form.get('ano_publicacao') or 0) or None
+    except ValueError: ano = None
+    try: quantidade = max(0, int(form.get('quantidade') or 1))
+    except ValueError: quantidade = 1
+    try: avaliacao = min(5.0, max(0.0, float(form.get('avaliacao') or 0)))
+    except ValueError: avaliacao = 0.0
+    return {'titulo':form.get('titulo','').strip(), 'autor':form.get('autor','').strip(), 'isbn':form.get('isbn','').strip(), 'editora':form.get('editora','').strip(), 'ano_publicacao':ano, 'categoria':form.get('categoria','').strip(), 'descricao':form.get('descricao','').strip(), 'quantidade':quantidade, 'avaliacao':avaliacao}
+
+@app.route('/biblioteca/livro/<int:livro_id>/editar', methods=['GET', 'POST'])
+@login_requerido()
+def biblioteca_editar(livro_id):
+    livro = executar_query('SELECT * FROM livros WHERE id = ?', (livro_id,), fetch_one=True)
+    if not livro:
+        flash('Livro não encontrado.', 'error'); return redirect('/biblioteca')
+    if request.method == 'POST':
+        dados = _dados_livro_form(); dados['id'] = livro_id
+        if not dados['titulo'] or not dados['autor']:
+            flash('Título e autor são obrigatórios.', 'error')
+        else:
+            ok = executar_update('UPDATE livros SET titulo=:titulo, autor=:autor, isbn=:isbn, editora=:editora, ano_publicacao=:ano_publicacao, categoria=:categoria, descricao=:descricao, quantidade=:quantidade, avaliacao=:avaliacao, atualizado_em=CURRENT_TIMESTAMP WHERE id=:id', dados)
+            if ok:
+                flash('Livro atualizado com sucesso.', 'success'); return redirect(f'/biblioteca/livro/{livro_id}')
+            flash('Não foi possível atualizar o livro.', 'error')
+    return render_template('biblioteca/formulario.html', livro=livro)
+
+@app.route('/biblioteca/livro/<int:livro_id>/excluir', methods=['POST'])
+@login_requerido()
+def biblioteca_excluir(livro_id):
+    executar_update('DELETE FROM livros WHERE id = ?', (livro_id,))
+    flash('Livro excluído (se existia).', 'success'); return redirect('/biblioteca')
+
+# API REST documentada: os endpoints abaixo permitem integração com outros sistemas.
+@app.route('/api/livros', methods=['GET', 'POST'])
+def api_livros():
+    if request.method == 'GET':
+        termo = (request.args.get('q') or '').strip()
+        rows = executar_query('SELECT * FROM livros WHERE titulo LIKE ? OR autor LIKE ? ORDER BY titulo' if termo else 'SELECT * FROM livros ORDER BY titulo', (f'%{termo}%', f'%{termo}%') if termo else ()) or []
+        return jsonify([dict(row) for row in rows])
+    payload = request.get_json(silent=True) or {}
+    titulo, autor = str(payload.get('titulo','')).strip(), str(payload.get('autor','')).strip()
+    if not titulo or not autor: return jsonify({'erro':'titulo e autor são obrigatórios'}), 400
+    dados = (titulo, autor, payload.get('isbn',''), payload.get('editora',''), payload.get('ano_publicacao'), payload.get('categoria',''), payload.get('descricao',''), max(0, int(payload.get('quantidade',1))), min(5, max(0, float(payload.get('avaliacao',0)))))
+    conn = get_db()
+    try:
+        cur = conn.execute('INSERT INTO livros (titulo,autor,isbn,editora,ano_publicacao,categoria,descricao,quantidade,avaliacao) VALUES (?,?,?,?,?,?,?,?,?)', dados); conn.commit()
+        return jsonify({'id':cur.lastrowid, 'mensagem':'Livro cadastrado'}), 201
+    finally: conn.close()
+
+@app.route('/api/livros/<int:livro_id>', methods=['GET', 'PUT', 'DELETE'])
+def api_livro(livro_id):
+    if request.method == 'GET':
+        livro = executar_query('SELECT * FROM livros WHERE id=?', (livro_id,), fetch_one=True)
+        return (jsonify(dict(livro)), 200) if livro else (jsonify({'erro':'Livro não encontrado'}), 404)
+    if request.method == 'DELETE':
+        conn=get_db()
+        try:
+            cur=conn.execute('DELETE FROM livros WHERE id=?',(livro_id,)); conn.commit()
+            return (jsonify({'mensagem':'Livro excluído'}), 200) if cur.rowcount else (jsonify({'erro':'Livro não encontrado'}),404)
+        finally: conn.close()
+    payload=request.get_json(silent=True) or {}
+    campos=('titulo','autor','isbn','editora','ano_publicacao','categoria','descricao','quantidade','avaliacao')
+    conn=get_db()
+    try:
+        atual=conn.execute('SELECT * FROM livros WHERE id=?',(livro_id,)).fetchone()
+        if not atual: return jsonify({'erro':'Livro não encontrado'}),404
+        vals={k:payload.get(k, atual[k]) for k in campos}
+        if not str(vals['titulo']).strip() or not str(vals['autor']).strip(): return jsonify({'erro':'titulo e autor são obrigatórios'}),400
+        vals['quantidade']=max(0,int(vals['quantidade'] or 0)); vals['avaliacao']=min(5,max(0,float(vals['avaliacao'] or 0)))
+        conn.execute('UPDATE livros SET titulo=:titulo,autor=:autor,isbn=:isbn,editora=:editora,ano_publicacao=:ano_publicacao,categoria=:categoria,descricao=:descricao,quantidade=:quantidade,avaliacao=:avaliacao,atualizado_em=CURRENT_TIMESTAMP WHERE id=:id',{**vals,'id':livro_id}); conn.commit()
+        return jsonify({'mensagem':'Livro atualizado','id':livro_id})
+    finally: conn.close()
+
+@app.route('/api/rotas', methods=['GET'])
+def api_listar_rotas():
+    """Lista endpoints registrados; útil para diagnóstico. Não revela parâmetros secretos."""
+    rotas=[]
+    for regra in sorted(app.url_map.iter_rules(), key=lambda r: (r.rule, sorted(r.methods))):
+        rotas.append({'caminho':regra.rule,'metodos':sorted(m for m in regra.methods if m not in ('HEAD','OPTIONS')), 'endpoint':regra.endpoint})
+    return jsonify(rotas)
+
 
 if __name__ == '__main__':
     try:

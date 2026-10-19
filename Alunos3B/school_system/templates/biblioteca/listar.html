@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Biblioteca{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Biblioteca</h1><p class="subtext">Consulte o acervo, veja os detalhes e gerencie livros.</p></div><a class="button button-primary" href="/biblioteca/livro/novo">Cadastrar livro</a></div>
+<form method="get" action="/biblioteca" class="search-form" style="display:flex;gap:10px;margin:20px 0"><input name="q" value="{{ termo }}" placeholder="Buscar por título, autor, ISBN ou categoria"><button type="submit">Buscar</button><a href="/biblioteca">Limpar</a></form>
+<div class="table-wrap"><table><thead><tr><th>Título</th><th>Autor</th><th>Categoria</th><th>Disponíveis</th><th>Avaliação</th><th>Ações</th></tr></thead><tbody>
+{% for livro in livros %}<tr><td><strong>{{ livro.titulo }}</strong><br><small>{{ livro.editora or 'Editora não informada' }}{% if livro.ano_publicacao %} · {{ livro.ano_publicacao }}{% endif %}</small></td><td>{{ livro.autor }}</td><td>{{ livro.categoria or '—' }}</td><td>{{ livro.quantidade }}</td><td><span aria-label="{{ livro.avaliacao }} de 5">{% for n in range(1,6) %}{% if n <= livro.avaliacao|round(0,'floor') %}★{% else %}☆{% endif %}{% endfor %}</span> {{ '%.1f'|format(livro.avaliacao) }}</td><td><a href="/biblioteca/livro/{{ livro.id }}">Detalhes</a> · <a href="/biblioteca/livro/{{ livro.id }}/editar">Editar</a></td></tr>
+{% else %}<tr><td colspan="6">Nenhum livro cadastrado. Use “Cadastrar livro” para iniciar o acervo.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

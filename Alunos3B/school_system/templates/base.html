@@ -861,6 +861,10 @@
 
             <nav class="nav-section">
                 <div class="nav-label">Principal</div>
+                <a href="/biblioteca" class="nav-link {% if request.path.startswith('/biblioteca') %}active{% endif %}">
+                    <span class="nav-icon">LB</span>
+                    <span>Biblioteca</span>
+                </a>
                 <a href="/dashboard" class="nav-link {% if request.path.startswith('/dashboard') %}active{% endif %}">
                     <span class="nav-icon">DB</span>
                     <span>Dashboard</span>

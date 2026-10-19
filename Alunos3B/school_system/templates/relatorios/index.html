@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Relat&oacute;rios - Sistema de Gest&atilde;o Escolar{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div>
+        <div class="hero-chip">Relat&oacute;rios</div>
+        <h1>Relat&oacute;rios do sistema</h1>
+        <p>Acompanhe turmas, frequ&ecirc;ncia e desempenho com uma navega&ccedil;&atilde;o mais direta.</p>
+    </div>
+</section>
+
+<section class="card">
+    <div class="module-grid">
+        <a href="/relatorio/turmas" class="module-card">
+            <span class="module-icon">TR</span>
+            <h3>Relat&oacute;rio de turmas</h3>
+            <p>Visualize turmas, professores e alunos vinculados.</p>
+        </a>
+
+        <a href="/relatorio/frequencia" class="module-card">
+            <span class="module-icon">FR</span>
+            <h3>Relat&oacute;rio de frequ&ecirc;ncia</h3>
+            <p>Acompanhe presen&ccedil;a por aluno e turma.</p>
+        </a>
+
+        <a href="/relatorio/desempenho" class="module-card">
+            <span class="module-icon">DS</span>
+            <h3>Relat&oacute;rio de desempenho</h3>
+            <p>Veja notas, m&eacute;dias e evolu&ccedil;&atilde;o por m&oacute;dulo.</p>
+        </a>
+    </div>
+</section>
+{% endblock %}

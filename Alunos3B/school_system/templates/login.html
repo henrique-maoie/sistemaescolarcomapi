@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Sistema de Gest&atilde;o Escolar{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+    <section class="auth-copy">
+        <div class="brand">
+            <div class="brand-mark">SE</div>
+            <div class="brand-title">
+                <strong>Escola Sistema</strong>
+                <span>Gest&atilde;o escolar integrada</span>
+            </div>
+        </div>
+
+        <h1>Organize alunos, turmas e matr&iacute;culas em um s&oacute; lugar.</h1>
+        <p>
+            Um painel mais claro para administra&ccedil;&atilde;o, pedag&oacute;gico e comercial
+            acompanharem a rotina da escola com mais rapidez.
+        </p>
+
+        <div class="auth-highlights">
+            <div class="auth-highlight">
+                <strong>Admin</strong>
+                <span>Acesso completo</span>
+            </div>
+            <div class="auth-highlight">
+                <strong>Professor</strong>
+                <span>Alunos e relat&oacute;rios</span>
+            </div>
+            <div class="auth-highlight">
+                <strong>Comercial</strong>
+                <span>Matr&iacute;culas e vagas</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="auth-card">
+        <h1>Entrar no sistema</h1>
+        <p class="subtext">Use seu email e senha para acessar o painel da escola.</p>
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="seuemail@escola.com" autocomplete="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" placeholder="Digite sua senha" autocomplete="current-password" required>
+            </div>
+
+            <button type="submit" style="width: 100%;">Entrar</button>
+        </form>
+
+        <p style="margin: 18px 0 0; color: var(--muted); text-align: center;">
+            N&atilde;o tem conta?
+            <a href="/cadastro" style="color: var(--primary); font-weight: 800; text-decoration: none;">Cadastre-se</a>
+        </p>
+    </section>
+</div>
+{% endblock %}

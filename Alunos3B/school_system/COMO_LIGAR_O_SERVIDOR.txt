@@ -1,0 +1,24 @@
+COMO LIGAR O SISTEMA ESCOLAR
+============================
+
+1. Abra a pasta school_system.
+
+2. De dois cliques em:
+   INICIAR_SERVIDOR.bat
+
+3. O navegador vai abrir neste computador em:
+   http://localhost:5000
+
+4. Para abrir em outro computador da mesma rede/Wi-Fi, use o endereco que aparecer na janela.
+   Exemplo:
+   http://192.168.0.10:5000
+
+5. Se outro computador nao conseguir abrir, execute uma vez:
+   LIBERAR_ACESSO_REDE_WINDOWS.bat
+
+   Importante: esse segundo arquivo precisa de permissao de administrador, porque altera o Firewall do Windows.
+
+Observacoes:
+- Os computadores precisam estar na mesma rede/Wi-Fi.
+- Para acesso pela internet fora da sua rede, seria necessario configurar roteador, VPN ou hospedar o sistema em um servidor.
+- Para parar o sistema, feche a janela do servidor ou pressione Ctrl+C.

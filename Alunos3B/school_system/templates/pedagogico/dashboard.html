@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Pedag&oacute;gico - Sistema de Gest&atilde;o Escolar{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div>
+        <div class="hero-chip">Pedag&oacute;gico</div>
+        <h1>Rotina acad&ecirc;mica</h1>
+        <p>Acompanhe turmas, frequ&ecirc;ncia, notas, alunos e ocupa&ccedil;&atilde;o das salas.</p>
+    </div>
+    <a href="/pedagogico/salas" class="btn">Ver salas</a>
+</section>
+
+<section class="card">
+    <h2>Acessos do pedag&oacute;gico</h2>
+    <div class="module-grid">
+        <a href="/pedagogico/turmas" class="module-card">
+            <span class="module-icon">TR</span>
+            <h3>Turmas</h3>
+            <p>Veja todas as turmas e acompanhe a evolu&ccedil;&atilde;o.</p>
+        </a>
+
+        <a href="/relatorios" class="module-card">
+            <span class="module-icon">RP</span>
+            <h3>Relat&oacute;rios</h3>
+            <p>Frequ&ecirc;ncia, desempenho, hist&oacute;rico e turmas.</p>
+        </a>
+
+        <a href="/pedagogico/salas" class="module-card">
+            <span class="module-icon">SL</span>
+            <h3>Salas</h3>
+            <p>Capacidade, ocupadas e vagas livres.</p>
+        </a>
+
+        <a href="/alunos" class="module-card">
+            <span class="module-icon">AL</span>
+            <h3>Alunos</h3>
+            <p>Consulte cadastros, anexos e hist&oacute;rico escolar.</p>
+        </a>
+    </div>
+</section>
+
+<section class="card">
+    <h2>Turmas cadastradas</h2>
+    {% if turmas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Turma</th>
+                    <th>Curso</th>
+                    <th>Professor</th>
+                    <th>Alunos</th>
+                    <th>In&iacute;cio</th>
+                    <th>A&ccedil;&otilde;es</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for turma in turmas %}
+                    <tr>
+                        <td><strong>{{ turma.nome }}</strong></td>
+                        <td>{{ turma.curso_nome }}</td>
+                        <td>{{ turma.professor_nome }}</td>
+                        <td><span class="badge badge-primary">{{ turma.total_alunos }}</span></td>
+                        <td>{{ turma.data_inicio }}</td>
+                        <td>
+                            <a href="/turma/{{ turma.id }}/frequencia" class="btn-small">Frequ&ecirc;ncia</a>
+                            <a href="/turma/{{ turma.id }}/notas" class="btn-small">Notas</a>
+                            <a href="/pedagogico/turma/{{ turma.id }}/alunos" class="btn-small">Alunos</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="muted">Nenhuma turma cadastrada.</p>
+    {% endif %}
+</section>
+{% endblock %}

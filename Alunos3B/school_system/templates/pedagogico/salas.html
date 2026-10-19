@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Salas e Vagas - Pedagogico{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Salas e Vagas</h1>
+    <p style="color: #666; margin-bottom: 20px;">Acompanhe a ocupacao das turmas e a quantidade de vagas livres em cada sala.</p>
+
+    {% if salas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Curso</th>
+                    <th>Turma</th>
+                    <th>Sala</th>
+                    <th>Professor</th>
+                    <th>Capacidade</th>
+                    <th>Ocupadas</th>
+                    <th>Livres</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sala in salas %}
+                    <tr>
+                        <td>{{ sala.curso_nome }}</td>
+                        <td><strong>{{ sala.turma_nome }}</strong></td>
+                        <td>{{ sala.sala_nome }}</td>
+                        <td>{{ sala.professor_nome }}</td>
+                        <td>{{ sala.capacidade }}</td>
+                        <td>{{ sala.ocupadas }}</td>
+                        <td>
+                            {% if sala.vagas_disponiveis > 0 %}
+                                <span class="badge badge-success">{{ sala.vagas_disponiveis }}</span>
+                            {% else %}
+                                <span class="badge badge-danger">Lotada</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhuma turma ativa encontrada.</p>
+    {% endif %}
+</div>
+{% endblock %}

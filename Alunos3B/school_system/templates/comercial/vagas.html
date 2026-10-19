@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Vagas por Turma/Sala - Comercial{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Vagas por Turma/Sala</h1>
+    <p style="color: #666; margin-bottom: 20px;">Use esta tela para informar rapidamente quais turmas ainda aceitam novos alunos.</p>
+
+    {% if turmas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Curso</th>
+                    <th>Turma</th>
+                    <th>Sala</th>
+                    <th>Professor</th>
+                    <th>Capacidade</th>
+                    <th>Ocupadas</th>
+                    <th>Livres</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for turma in turmas %}
+                    <tr>
+                        <td>{{ turma.curso_nome }}</td>
+                        <td><strong>{{ turma.turma_nome }}</strong></td>
+                        <td>{{ turma.sala_nome }}</td>
+                        <td>{{ turma.professor_nome }}</td>
+                        <td>{{ turma.capacidade }}</td>
+                        <td>{{ turma.ocupadas }}</td>
+                        <td><span class="badge badge-success">{{ turma.vagas_disponiveis }}</span></td>
+                        <td>
+                            {% if turma.vagas_disponiveis > 0 %}
+                                <span class="badge badge-success">Com vagas</span>
+                            {% else %}
+                                <span class="badge badge-danger">Lotada</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhuma turma ativa encontrada.</p>
+    {% endif %}
+</div>
+{% endblock %}

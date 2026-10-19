@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Comercial - Sistema de Gest&atilde;o Escolar{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div>
+        <div class="hero-chip">Comercial</div>
+        <h1>Matr&iacute;culas e vagas</h1>
+        <p>Acompanhe capta&ccedil;&atilde;o, pagamentos, parcelas e ocupa&ccedil;&atilde;o das turmas.</p>
+    </div>
+    <a href="/comercial/matricula/nova" class="btn">Nova matr&iacute;cula</a>
+</section>
+
+<div class="dashboard-grid">
+    <div class="stat-card">
+        <h3>Matr&iacute;culas do m&ecirc;s</h3>
+        <div class="value">{{ matriculas_mes }}</div>
+        <p>Novas matr&iacute;culas</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Receita do m&ecirc;s</h3>
+        <div class="value">R$ {{ "%.2f"|format(receita_mes) }}</div>
+        <p>Arrecadado</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Valores pendentes</h3>
+        <div class="value">R$ {{ "%.2f"|format(pendente) }}</div>
+        <p>A receber</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Vagas dispon&iacute;veis</h3>
+        <div class="value">{{ vagas_disponiveis }}</div>
+        <p>{{ vagas_ocupadas }} ocupadas de {{ total_vagas }}</p>
+    </div>
+</div>
+
+<section class="card">
+    <h2>A&ccedil;&otilde;es comerciais</h2>
+    <div class="module-grid">
+        <a href="/comercial/matricula/nova" class="module-card">
+            <span class="module-icon">NM</span>
+            <h3>Nova matr&iacute;cula</h3>
+            <p>Crie matr&iacute;cula com parcelas e turma vinculada.</p>
+        </a>
+
+        <a href="/comercial/matriculas" class="module-card">
+            <span class="module-icon">MT</span>
+            <h3>Matr&iacute;culas</h3>
+            <p>Liste matr&iacute;culas ativas, status e financeiro.</p>
+        </a>
+
+        <a href="/comercial/financeiro" class="module-card">
+            <span class="module-icon">FI</span>
+            <h3>Financeiro</h3>
+            <p>Controle parcelas, pagamentos e pend&ecirc;ncias.</p>
+        </a>
+
+        <a href="/comercial/vagas" class="module-card">
+            <span class="module-icon">VG</span>
+            <h3>Vagas por turma</h3>
+            <p>Veja capacidade, ocupadas e livres para divulgar a escola.</p>
+        </a>
+    </div>
+</section>
+
+<section class="card">
+    <h2>Turmas com vagas</h2>
+    {% if turmas_vagas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Curso</th>
+                    <th>Turma</th>
+                    <th>Sala</th>
+                    <th>Capacidade</th>
+                    <th>Ocupadas</th>
+                    <th>Livres</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for turma in turmas_vagas %}
+                    <tr>
+                        <td>{{ turma.curso_nome }}</td>
+                        <td>{{ turma.turma_nome }}</td>
+                        <td>{{ turma.sala_nome }}</td>
+                        <td>{{ turma.capacidade }}</td>
+                        <td>{{ turma.ocupadas }}</td>
+                        <td><span class="badge badge-success">{{ turma.vagas_disponiveis }}</span></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="muted">Nenhuma turma ativa encontrada.</p>
+    {% endif %}
+</section>
+{% endblock %}

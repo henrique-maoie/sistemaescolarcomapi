@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Alunos da Turma - Pedagogico{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Alunos da Turma</h1>
+    <p><strong>{{ turma.nome }}</strong> - {{ turma.curso_nome }}</p>
+
+    {% if alunos %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Matricula</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Status</th>
+                    <th>Acoes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aluno in alunos %}
+                    <tr>
+                        <td>{{ aluno.matricula }}</td>
+                        <td>{{ aluno.nome }}</td>
+                        <td>{{ aluno.email }}</td>
+                        <td>{{ aluno.telefone or '-' }}</td>
+                        <td>{{ aluno.status_matricula }}</td>
+                        <td>
+                            <a href="/aluno/{{ aluno.id }}" class="btn-small" style="display: inline-block;">Ver aluno</a>
+                            <a href="/pedagogico/aluno/{{ aluno.id }}" class="btn-small" style="display: inline-block;">Pedagogico</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhum aluno matriculado nesta turma.</p>
+    {% endif %}
+</div>
+{% endblock %}

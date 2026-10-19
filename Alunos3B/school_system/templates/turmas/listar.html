@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Turmas - Sistema de Gest&atilde;o Escolar{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div>
+        <div class="hero-chip">Turmas</div>
+        <h1>Gerenciar turmas</h1>
+        <p>Controle curso, professor, hor&aacute;rio, sala e quantidade de alunos por turma.</p>
+    </div>
+    {% if pode_admin %}
+        <a href="/turma/nova" class="btn">Nova turma</a>
+    {% endif %}
+</section>
+
+<section class="card">
+    {% if turmas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>C&oacute;digo</th>
+                    <th>Nome</th>
+                    <th>Curso</th>
+                    <th>Professor</th>
+                    <th>Alunos</th>
+                    <th>Hor&aacute;rio</th>
+                    <th>Sala</th>
+                    <th>A&ccedil;&otilde;es</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for turma in turmas %}
+                    <tr>
+                        <td><span class="badge badge-primary">{{ turma.codigo }}</span></td>
+                        <td><strong>{{ turma.nome }}</strong></td>
+                        <td>{{ turma.curso_nome }}</td>
+                        <td>{{ turma.professor_nome }}</td>
+                        <td>{{ turma.total_alunos }}</td>
+                        <td>{{ turma.horario }}</td>
+                        <td>{{ turma.sala }}</td>
+                        <td>
+                            <a href="/turma/{{ turma.id }}/frequencia" class="btn-small">Frequ&ecirc;ncia</a>
+                            <a href="/turma/{{ turma.id }}/notas" class="btn-small">Notas</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="muted">Nenhuma turma cadastrada.</p>
+    {% endif %}
+</section>
+{% endblock %}

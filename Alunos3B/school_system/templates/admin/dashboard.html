@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Sistema de Gest&atilde;o Escolar{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div>
+        <div class="hero-chip">Administra&ccedil;&atilde;o</div>
+        <h1>Painel de controle</h1>
+        <p>Gerencie a estrutura da escola, usu&aacute;rios, cursos, turmas e cadastros principais.</p>
+    </div>
+    <a href="/admin/usuarios" class="btn">Usu&aacute;rios</a>
+</section>
+
+<div class="dashboard-grid">
+    <div class="stat-card">
+        <h3>Total de alunos</h3>
+        <div class="value">{{ total_alunos }}</div>
+        <p>Alunos cadastrados</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Professores</h3>
+        <div class="value">{{ total_professores }}</div>
+        <p>Equipe docente</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Funcion&aacute;rios</h3>
+        <div class="value">{{ total_funcionarios }}</div>
+        <p>Equipe administrativa</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Turmas</h3>
+        <div class="value">{{ total_turmas }}</div>
+        <p>Turmas cadastradas</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Cursos</h3>
+        <div class="value">{{ total_cursos }}</div>
+        <p>Cat&aacute;logo escolar</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Receita total</h3>
+        <div class="value">R$ {{ "%.2f"|format(receita_total) }}</div>
+        <p>Valores registrados</p>
+    </div>
+</div>
+
+<section class="card">
+    <h2>Menu de gerenciamento</h2>
+    <div class="module-grid">
+        <a href="/admin/funcionarios" class="module-card">
+            <span class="module-icon">FN</span>
+            <h3>Funcion&aacute;rios</h3>
+            <p>Cadastre e acompanhe a equipe da escola.</p>
+        </a>
+
+        <a href="/admin/cursos" class="module-card">
+            <span class="module-icon">CR</span>
+            <h3>Cursos</h3>
+            <p>Organize cursos e trilhas oferecidas.</p>
+        </a>
+
+        <a href="/admin/modulos" class="module-card">
+            <span class="module-icon">MD</span>
+            <h3>M&oacute;dulos</h3>
+            <p>Monte a estrutura de conte&uacute;do dos cursos.</p>
+        </a>
+
+        <a href="/admin/setores" class="module-card">
+            <span class="module-icon">ST</span>
+            <h3>Setores</h3>
+            <p>Separe responsabilidades por &aacute;rea.</p>
+        </a>
+
+        <a href="/admin/usuarios" class="module-card">
+            <span class="module-icon">US</span>
+            <h3>Usu&aacute;rios</h3>
+            <p>Controle acessos e permiss&otilde;es.</p>
+        </a>
+
+        <a href="/turmas" class="module-card">
+            <span class="module-icon">TR</span>
+            <h3>Turmas</h3>
+            <p>Crie e gerencie turmas da escola.</p>
+        </a>
+
+        <a href="/alunos" class="module-card">
+            <span class="module-icon">AL</span>
+            <h3>Alunos</h3>
+            <p>Consulte cadastros e hist&oacute;ricos.</p>
+        </a>
+
+        <a href="/relatorios" class="module-card">
+            <span class="module-icon">RP</span>
+            <h3>Relat&oacute;rios</h3>
+            <p>Acompanhe dados acad&ecirc;micos e operacionais.</p>
+        </a>
+    </div>
+</section>
+
+<section class="card">
+    <h2>&Uacute;ltimas matr&iacute;culas</h2>
+    {% if ultimas_matriculas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Aluno</th>
+                    <th>Turma</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for matricula in ultimas_matriculas %}
+                    <tr>
+                        <td>{{ matricula.nome }}</td>
+                        <td>{{ matricula.turma }}</td>
+                        <td>{{ matricula.data_matricula }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="muted">Nenhuma matr&iacute;cula recente.</p>
+    {% endif %}
+</section>
+{% endblock %}

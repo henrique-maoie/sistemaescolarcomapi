@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Alunos - Sistema de Gest&atilde;o Escolar{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div>
+        <div class="hero-chip">Alunos</div>
+        <h1>Gerenciar alunos</h1>
+        <p>Consulte matr&iacute;cula, dados principais, hist&oacute;rico e detalhes de cada aluno.</p>
+    </div>
+    {% if pode_gerenciar_alunos %}
+        <a href="/aluno/novo" class="btn">Novo aluno</a>
+    {% endif %}
+</section>
+
+<section class="card">
+    {% if alunos %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Matr&iacute;cula</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>CPF</th>
+                    <th>Data de nascimento</th>
+                    <th>A&ccedil;&otilde;es</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aluno in alunos %}
+                    <tr>
+                        <td><span class="badge badge-primary">{{ aluno.matricula }}</span></td>
+                        <td><strong>{{ aluno.nome }}</strong></td>
+                        <td>{{ aluno.email }}</td>
+                        <td>{{ aluno.cpf }}</td>
+                        <td>{{ aluno.data_nascimento }}</td>
+                        <td>
+                            <a href="/aluno/{{ aluno.id }}" class="btn-small">Ver aluno</a>
+                            {% if pode_gerenciar_alunos %}
+                                <button type="button" class="btn-small secondary">Editar</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="muted">Nenhum aluno cadastrado.</p>
+    {% endif %}
+</section>
+{% endblock %}
